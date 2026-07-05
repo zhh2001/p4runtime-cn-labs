@@ -118,6 +118,18 @@ class TableEntryBuilder:
             param.value = encode(value, info.bitwidth)
         return self
 
+    def member_id(self, member_id: int) -> "TableEntryBuilder":
+        if self._table.message.implementation_id == 0:
+            raise ValueError(f"表 {self._table.name} 没有 ActionProfile")
+        self._entry.action.action_profile_member_id = member_id
+        return self
+
+    def group_id(self, group_id: int) -> "TableEntryBuilder":
+        if self._table.message.implementation_id == 0:
+            raise ValueError(f"表 {self._table.name} 没有 ActionProfile")
+        self._entry.action.action_profile_group_id = group_id
+        return self
+
     def priority(self, value: int) -> "TableEntryBuilder":
         if value <= 0:
             raise ValueError("priority 必须大于 0")
@@ -142,4 +154,13 @@ def update(
 ) -> p4runtime_pb2.Update:
     result = p4runtime_pb2.Update(type=update_type)
     result.entity.table_entry.CopyFrom(table_entry)
+    return result
+
+
+def entity_update(
+    update_type: int,
+    value: p4runtime_pb2.Entity,
+) -> p4runtime_pb2.Update:
+    result = p4runtime_pb2.Update(type=update_type)
+    result.entity.CopyFrom(value)
     return result
