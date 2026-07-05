@@ -46,6 +46,14 @@ make inspect LAB=01
 
 实验正文见 [Pipeline 与 P4Info](labs/01-pipeline/README.md)。这一章只编译和观察文件，还不会启动交换机，也不需要 `sudo`。
 
+准备进入 Shell 实验时，先创建它自己的 Python 环境：
+
+```bash
+make setup
+```
+
+然后按 [P4Runtime Shell](labs/02-table-entry/README.md) 中的双终端步骤启动 Mininet 并安装 pipeline。
+
 ## 阅读方式
 
 每个实验都会给出目标、拓扑、关键代码、运行步骤和观察结果。建议先照着跑通，再回头看对应的规范章节。P4Runtime 里很多细节，例如 bytestring 编码和 primary controller 权限，只看消息结构很容易漏掉。

@@ -5,21 +5,28 @@ LAB_DIR := $(firstword $(wildcard labs/$(LAB)-*))
 LAB_NAME := $(notdir $(LAB_DIR))
 P4_SOURCE := $(LAB_DIR)/main.p4
 BUILD_DIR := build/$(LAB_NAME)
+TOPOLOGY := $(LAB_DIR)/topology.py
 P4C ?= p4c-bm2-ss
 
-.PHONY: help setup check-env require-lab build inspect clean check
+.PHONY: help setup shell-env check-env require-lab require-topology build inspect run shell stop clean check
 
 help:
 	@echo "可用命令："
 	@echo "  make check-env  检查本机 P4 实验工具"
-	@echo "  make setup      确认基础环境可用"
+	@echo "  make setup      准备基础工具和 P4Runtime Shell"
 	@echo "  make build LAB=01    编译指定实验"
 	@echo "  make inspect LAB=01  查看 P4Info 对象"
+	@echo "  sudo make run LAB=02 启动 Mininet 与 BMv2"
+	@echo "  make shell LAB=02    连接 P4Runtime Shell"
+	@echo "  sudo make stop       清理 Mininet"
 	@echo "  make clean      删除编译产物"
 	@echo "  make check      运行当前阶段的静态检查"
 
-setup: check-env
-	@echo "基础工具已经就绪；Python 虚拟环境会在对应实验中创建。"
+setup: check-env shell-env
+	@echo "基础工具和 Shell 环境已经就绪。"
+
+shell-env:
+	@./scripts/setup-shell-env.sh
 
 check-env:
 	@./scripts/check-env.sh
@@ -27,6 +34,12 @@ check-env:
 require-lab:
 	@if [[ -z "$(LAB_DIR)" || ! -f "$(P4_SOURCE)" ]]; then \
 		echo "找不到 LAB=$(LAB) 对应的 P4 实验。" >&2; \
+		exit 1; \
+	fi
+
+require-topology: require-lab
+	@if [[ ! -f "$(TOPOLOGY)" ]]; then \
+		echo "LAB=$(LAB) 还没有可运行的 Mininet 拓扑。" >&2; \
 		exit 1; \
 	fi
 
@@ -42,13 +55,35 @@ build: require-lab
 inspect: build
 	@python3 scripts/inspect-p4info.py "$(BUILD_DIR)/p4info.txtpb"
 
+run: require-topology
+	@PYTHONDONTWRITEBYTECODE=1 python3 "$(TOPOLOGY)" \
+		--grpc-addr 127.0.0.1:9559 \
+		--device-id 1 \
+		--cpu-port 510
+
+shell: build
+	@if [[ ! -x .venv-shell/bin/python ]]; then \
+		echo "缺少 .venv-shell，请先运行 make setup。" >&2; \
+		exit 1; \
+	fi
+	@.venv-shell/bin/python -m p4runtime_sh \
+		--grpc-addr 127.0.0.1:9559 \
+		--device-id 1 \
+		--election-id 0,1 \
+		--config "$(BUILD_DIR)/p4info.txtpb,$(BUILD_DIR)/pipeline.json"
+
+stop:
+	@mn -c
+
 clean:
 	@rm -rf build
 
 check: check-env
-	@bash -n scripts/check-env.sh
+	@bash -n scripts/check-env.sh scripts/setup-shell-env.sh
 	@python3 -m py_compile scripts/inspect-p4info.py
+	@python3 -m py_compile tools/p4_mininet.py labs/02-table-entry/topology.py
 	@$(MAKE) --no-print-directory inspect LAB=01 >/dev/null
+	@$(MAKE) --no-print-directory inspect LAB=02 >/dev/null
 	@python3 -m json.tool build/01-pipeline/pipeline.json >/dev/null
 	@python3 scripts/inspect-p4info.py build/01-pipeline/p4info.txtpb | grep -q '^action .*0x01'
 	@python3 scripts/inspect-p4info.py build/01-pipeline/p4info.txtpb | grep -q '^table .*0x02'
