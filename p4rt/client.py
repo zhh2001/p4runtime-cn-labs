@@ -247,6 +247,60 @@ class P4RuntimeClient:
         for result in self.read([query]):
             yield result.table_entry
 
+    def read_counter(self, counter_name_or_id: str | int, index: int | None = None):
+        if self.p4info_index is None:
+            raise RuntimeError("尚未读取 P4Info")
+        counter_id = self.p4info_index.resolve("counter", counter_name_or_id).id
+        query = p4runtime_pb2.Entity()
+        query.counter_entry.counter_id = counter_id
+        if index is not None:
+            query.counter_entry.index.index = index
+        for result in self.read([query]):
+            yield result.counter_entry
+
+    def read_direct_counters(self, table_name_or_id: str | int):
+        if self.p4info_index is None:
+            raise RuntimeError("尚未读取 P4Info")
+        table_id = self.p4info_index.table(table_name_or_id).id
+        query = p4runtime_pb2.Entity()
+        query.direct_counter_entry.table_entry.table_id = table_id
+        for result in self.read([query]):
+            yield result.direct_counter_entry
+
+    def configure_meter(
+        self,
+        meter_name_or_id: str | int,
+        index: int,
+        *,
+        cir: int,
+        cburst: int,
+        pir: int,
+        pburst: int,
+    ) -> None:
+        if self.p4info_index is None:
+            raise RuntimeError("尚未读取 P4Info")
+        meter_id = self.p4info_index.resolve("meter", meter_name_or_id).id
+        entry = p4runtime_pb2.MeterEntry(meter_id=meter_id)
+        entry.index.index = index
+        entry.config.cir = cir
+        entry.config.cburst = cburst
+        entry.config.pir = pir
+        entry.config.pburst = pburst
+        request = p4runtime_pb2.Update(type=p4runtime_pb2.Update.MODIFY)
+        request.entity.meter_entry.CopyFrom(entry)
+        self.write([request])
+
+    def read_meter(self, meter_name_or_id: str | int, index: int | None = None):
+        if self.p4info_index is None:
+            raise RuntimeError("尚未读取 P4Info")
+        meter_id = self.p4info_index.resolve("meter", meter_name_or_id).id
+        query = p4runtime_pb2.Entity()
+        query.meter_entry.meter_id = meter_id
+        if index is not None:
+            query.meter_entry.index.index = index
+        for result in self.read([query]):
+            yield result.meter_entry
+
     def _require_connected(self) -> None:
         if self.stub is None:
             raise RuntimeError("client 尚未连接")
