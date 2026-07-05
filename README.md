@@ -1,8 +1,8 @@
-# P4Runtime 中文实验
+# P4Runtime 中文教程
 
-这个仓库记录我学习 P4Runtime 控制面的过程。重点不是把规范翻译一遍，而是用几个能跑起来的小实验，弄清楚 controller 怎样认识并配置一条 P4 pipeline。
+这个仓库记录我学习 P4Runtime 控制平面的过程。重点是用几个能跑起来的小实验，弄清楚 controller 怎样认识并配置一条 P4 pipeline。
 
-教程面向已经了解 Ethernet、IPv4、路由表等基本概念的读者。没有接触过 P4 也可以从头跟，但这里不会系统讲解 P4_16 语法，只会补上实验需要的部分。
+教程面向已经了解 Ethernet、IPv4、路由表等基本概念的读者。没有接触过 P4 也可以从头跟，但这里不会系统讲解 P4_16 语法（P4 语法可以在 [p4-language-guide-zh](https://github.com/zhh2001/p4-language-guide-zh) 学习），只会补上实验需要的部分。
 
 ## 会做哪些实验
 
@@ -17,7 +17,7 @@
 7. 收发 PacketIn、PacketOut；
 8. 观察两个 controller 之间的 arbitration。
 
-代码以 Ubuntu 24.04、Mininet 和 BMv2 `simple_switch_grpc` 为主要环境。协议语义以 [P4Runtime v1.5.0](https://p4lang.github.io/p4runtime/spec/v1.5.0/P4Runtime-Spec.html) 为准；如果 BMv2 暂时不支持某项新能力，正文会直接标出来。
+代码以 Ubuntu 24.04、Mininet 和 BMv2 `simple_switch_grpc` 为主要环境。协议语义以 [P4Runtime v1.5.0](https://p4lang.github.io/p4runtime/spec/v1.5.0/P4Runtime-Spec.html) 为准。如果 BMv2 暂时不支持某项新能力，正文会直接标出来。
 
 ## 开始之前
 
@@ -36,6 +36,15 @@ make check-env
 - Python 3.12
 
 详细说明见[环境准备](docs/setup.md)。如果你已经有一套能运行 P4 官方 tutorials 的环境，通常不需要重复安装。
+
+第一个实验已经可以运行：
+
+```bash
+make build LAB=01
+make inspect LAB=01
+```
+
+实验正文见 [Pipeline 与 P4Info](labs/01-pipeline/README.md)。这一章只编译和观察文件，还不会启动交换机，也不需要 `sudo`。
 
 ## 阅读方式
 
