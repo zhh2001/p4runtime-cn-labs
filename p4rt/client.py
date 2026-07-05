@@ -13,6 +13,7 @@ from p4.config.v1 import p4info_pb2
 from p4.v1 import p4runtime_pb2, p4runtime_pb2_grpc
 
 from .p4info import P4InfoIndex
+from .errors import P4RuntimeWriteError
 
 
 class ArbitrationError(RuntimeError):
@@ -207,6 +208,44 @@ class P4RuntimeClient:
         self.p4info = response.config.p4info
         self.p4info_index = P4InfoIndex(self.p4info)
         return self.p4info
+
+    def write(
+        self,
+        updates,
+        *,
+        atomicity: int = p4runtime_pb2.WriteRequest.CONTINUE_ON_ERROR,
+    ) -> None:
+        self._require_primary()
+        request = p4runtime_pb2.WriteRequest(
+            device_id=self.device_id,
+            atomicity=atomicity,
+        )
+        request.election_id.high, request.election_id.low = self.election_id
+        if self.role_name:
+            request.role = self.role_name
+        request.updates.extend(updates)
+        try:
+            self.stub.Write(request, timeout=self.timeout)
+        except grpc.RpcError as error:
+            raise P4RuntimeWriteError(error) from None
+
+    def read(self, entities):
+        self._require_connected()
+        request = p4runtime_pb2.ReadRequest(device_id=self.device_id)
+        if self.role_name:
+            request.role = self.role_name
+        request.entities.extend(entities)
+        for response in self.stub.Read(request, timeout=self.timeout):
+            yield from response.entities
+
+    def read_table(self, table_name_or_id: str | int):
+        if self.p4info_index is None:
+            raise RuntimeError("尚未读取 P4Info")
+        table_id = self.p4info_index.table(table_name_or_id).id
+        query = p4runtime_pb2.Entity()
+        query.table_entry.table_id = table_id
+        for result in self.read([query]):
+            yield result.table_entry
 
     def _require_connected(self) -> None:
         if self.stub is None:
