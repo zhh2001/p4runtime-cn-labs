@@ -46,9 +46,12 @@ jobs:
     steps:
       - uses: actions/checkout@v6
       - name: Check external links
-        uses: lycheeverse/lychee-action@v2
-        with:
-          args: --no-progress --root-dir . './**/*.md'
-          fail: true
-          lycheeVersion: v0.24.2
-          token: ${{ secrets.GITHUB_TOKEN }}
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          docker run --rm \
+            -e GITHUB_TOKEN \
+            -v "$PWD:/input" \
+            -w /input \
+            lycheeverse/lychee:0.24.2 \
+            --no-progress --root-dir /input './**/*.md'
