@@ -1,0 +1,25 @@
+# Python
+.venv/
+.venv-shell/
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.coverage
+
+# P4 build output
+build/
+*.p4i
+*.p4info.txt
+*.p4info.bin
+*.bmv2.json
+
+# Runtime files
+*.log
+*.pcap
+*.pid
+
+# Editors and local files
+.idea/
+.vscode/
+*.swp
+.DS_Store
