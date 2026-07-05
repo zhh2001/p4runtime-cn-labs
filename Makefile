@@ -108,11 +108,12 @@ test: python-env
 check: check-env
 	@bash -n scripts/check-env.sh scripts/setup-shell-env.sh scripts/setup-python-env.sh
 	@python3 -m py_compile scripts/inspect-p4info.py
-	@python3 -m py_compile tools/p4_mininet.py labs/02-table-entry/topology.py labs/03-python-client/topology.py
-	@python3 -m py_compile p4rt/*.py labs/03-python-client/controller.py tests/*.py
+	@python3 -m py_compile tools/p4_mininet.py labs/02-table-entry/topology.py labs/03-python-client/topology.py labs/04-write-read/topology.py
+	@python3 -m py_compile p4rt/*.py labs/03-python-client/controller.py labs/04-write-read/controller.py tests/*.py
 	@$(MAKE) --no-print-directory inspect LAB=01 >/dev/null
 	@$(MAKE) --no-print-directory inspect LAB=02 >/dev/null
 	@$(MAKE) --no-print-directory inspect LAB=03 >/dev/null
+	@$(MAKE) --no-print-directory inspect LAB=04 >/dev/null
 	@$(MAKE) --no-print-directory test >/dev/null
 	@python3 -m json.tool build/01-pipeline/pipeline.json >/dev/null
 	@python3 scripts/inspect-p4info.py build/01-pipeline/p4info.txtpb | grep -q '^action .*0x01'
