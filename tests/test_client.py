@@ -43,6 +43,12 @@ class ClientMessageTest(unittest.TestCase):
         self.assertEqual(request.config.p4info.pkg_info.name, "unit-test")
         self.assertEqual(request.config.p4_device_config, b"{}")
 
+    def test_builds_write_request_with_controller_identity(self) -> None:
+        client = P4RuntimeClient(device_id=7, election_id=(2, 3))
+        request = client.build_write_request([])
+        self.assertEqual(request.device_id, 7)
+        self.assertEqual((request.election_id.high, request.election_id.low), (2, 3))
+
 
 if __name__ == "__main__":
     unittest.main()

@@ -1,6 +1,8 @@
 SHELL := /usr/bin/env bash
 
 LAB ?= 01
+ELECTION_ID ?= 0,1
+CONTROLLER_ARGS ?=
 LAB_DIR := $(firstword $(wildcard labs/$(LAB)-*))
 LAB_NAME := $(notdir $(LAB_DIR))
 P4_SOURCE := $(LAB_DIR)/main.p4
@@ -92,9 +94,9 @@ controller: build require-controller
 	@.venv/bin/python "$(CONTROLLER)" \
 		--grpc-addr 127.0.0.1:9559 \
 		--device-id 1 \
-		--election-id 0,1 \
+		--election-id "$(ELECTION_ID)" \
 		--p4info "$(BUILD_DIR)/p4info.txtpb" \
-		--device-config "$(BUILD_DIR)/pipeline.json"
+		--device-config "$(BUILD_DIR)/pipeline.json" $(CONTROLLER_ARGS)
 
 stop:
 	@mn -c
@@ -108,14 +110,15 @@ test: python-env
 check: check-env
 	@bash -n scripts/check-env.sh scripts/setup-shell-env.sh scripts/setup-python-env.sh
 	@python3 -m py_compile scripts/inspect-p4info.py
-	@python3 -m py_compile tools/p4_mininet.py labs/02-table-entry/topology.py labs/03-python-client/topology.py labs/04-write-read/topology.py labs/05-resources/topology.py labs/06-selector-replication/topology.py
-	@python3 -m py_compile p4rt/*.py labs/03-python-client/controller.py labs/04-write-read/controller.py labs/05-resources/controller.py labs/06-selector-replication/controller.py tests/*.py
+	@python3 -m py_compile tools/p4_mininet.py labs/02-table-entry/topology.py labs/03-python-client/topology.py labs/04-write-read/topology.py labs/05-resources/topology.py labs/06-selector-replication/topology.py labs/07-stream-arbitration/topology.py
+	@python3 -m py_compile p4rt/*.py labs/03-python-client/controller.py labs/04-write-read/controller.py labs/05-resources/controller.py labs/06-selector-replication/controller.py labs/07-stream-arbitration/controller.py tests/*.py
 	@$(MAKE) --no-print-directory inspect LAB=01 >/dev/null
 	@$(MAKE) --no-print-directory inspect LAB=02 >/dev/null
 	@$(MAKE) --no-print-directory inspect LAB=03 >/dev/null
 	@$(MAKE) --no-print-directory inspect LAB=04 >/dev/null
 	@$(MAKE) --no-print-directory inspect LAB=05 >/dev/null
 	@$(MAKE) --no-print-directory inspect LAB=06 >/dev/null
+	@$(MAKE) --no-print-directory inspect LAB=07 >/dev/null
 	@$(MAKE) --no-print-directory test >/dev/null
 	@python3 -m json.tool build/01-pipeline/pipeline.json >/dev/null
 	@python3 scripts/inspect-p4info.py build/01-pipeline/p4info.txtpb | grep -q '^action .*0x01'

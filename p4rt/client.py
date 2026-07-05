@@ -48,6 +48,7 @@ class P4RuntimeClient:
         election_id: tuple[int, int] = (0, 1),
         role_name: str = "",
         timeout: float = 5.0,
+        require_primary: bool = True,
     ) -> None:
         if device_id == 0:
             raise ValueError("P4Runtime v1.5.0 不允许 device_id=0")
@@ -64,10 +65,12 @@ class P4RuntimeClient:
         self.election_id = election_id
         self.role_name = role_name
         self.timeout = timeout
+        self.require_primary = require_primary
 
         self.channel = None
         self.stub = None
         self.is_primary = False
+        self.last_arbitration = None
         self.p4info = None
         self.p4info_index = None
 
@@ -119,8 +122,7 @@ class P4RuntimeClient:
             self.close()
             raise ArbitrationError(f"StreamChannel 失败：{event.code().name}") from event
 
-        self.is_primary = event.status.code == 0
-        if not self.is_primary:
+        if not self.is_primary and self.require_primary:
             message = event.status.message or "server 未授予 primary 权限"
             self.close()
             raise ArbitrationError(message)
@@ -146,6 +148,8 @@ class P4RuntimeClient:
         try:
             for response in self._responses:
                 if response.HasField("arbitration"):
+                    self.last_arbitration = response.arbitration
+                    self.is_primary = response.arbitration.status.code == 0
                     self._arbitration_events.put(response.arbitration)
                 else:
                     self._stream_messages.put(response)
@@ -164,6 +168,40 @@ class P4RuntimeClient:
         if isinstance(message, grpc.RpcError):
             raise message
         return message
+
+    def wait_for_arbitration(self, timeout: float | None = None):
+        event = self._arbitration_events.get(timeout=timeout)
+        if isinstance(event, grpc.RpcError):
+            raise event
+        return event
+
+    def update_election_id(self, election_id: tuple[int, int]) -> bool:
+        high, low = election_id
+        limit = (1 << 64) - 1
+        if not 0 <= high <= limit or not 0 <= low <= limit:
+            raise ValueError("election ID 的 high 和 low 必须是 uint64")
+
+        while True:
+            try:
+                self._arbitration_events.get_nowait()
+            except queue.Empty:
+                break
+
+        self.election_id = election_id
+        self.send_stream(self._arbitration_request())
+        event = self.wait_for_arbitration(timeout=self.timeout)
+        observed = (event.election_id.high, event.election_id.low)
+        if observed != election_id:
+            self.is_primary = False
+        return self.is_primary
+
+    def send_packet_out(self, payload: bytes, **metadata: str | int) -> None:
+        self._require_primary()
+        if self.p4info_index is None:
+            raise RuntimeError("尚未读取 P4Info")
+        from .packet import packet_out
+
+        self.send_stream(packet_out(self.p4info_index, payload, **metadata))
 
     def capabilities(self) -> p4runtime_pb2.CapabilitiesResponse:
         self._require_connected()
@@ -216,6 +254,18 @@ class P4RuntimeClient:
         atomicity: int = p4runtime_pb2.WriteRequest.CONTINUE_ON_ERROR,
     ) -> None:
         self._require_primary()
+        request = self.build_write_request(updates, atomicity=atomicity)
+        try:
+            self.stub.Write(request, timeout=self.timeout)
+        except grpc.RpcError as error:
+            raise P4RuntimeWriteError(error) from None
+
+    def build_write_request(
+        self,
+        updates,
+        *,
+        atomicity: int = p4runtime_pb2.WriteRequest.CONTINUE_ON_ERROR,
+    ) -> p4runtime_pb2.WriteRequest:
         request = p4runtime_pb2.WriteRequest(
             device_id=self.device_id,
             atomicity=atomicity,
@@ -224,10 +274,7 @@ class P4RuntimeClient:
         if self.role_name:
             request.role = self.role_name
         request.updates.extend(updates)
-        try:
-            self.stub.Write(request, timeout=self.timeout)
-        except grpc.RpcError as error:
-            raise P4RuntimeWriteError(error) from None
+        return request
 
     def read(self, entities):
         self._require_connected()
@@ -349,3 +396,4 @@ class P4RuntimeClient:
         self._responses = None
         self._receiver = None
         self.is_primary = False
+        self.last_arbitration = None

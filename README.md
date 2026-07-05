@@ -62,6 +62,8 @@ make setup
 
 [Action Selector 与 Multicast](labs/06-selector-replication/README.md)继续处理间接引用、ECMP group 与 PRE，并明确区分 v1.5 bindings 可表示的字段和 BMv2 真正支持的行为。
 
+[Packet I/O 与控制器仲裁](labs/07-stream-arbitration/README.md)把 StreamChannel 用起来：转发 PacketIn/PacketOut，并实际观察 primary、backup 和接管过程。
+
 ## 阅读方式
 
 每个实验都会给出目标、拓扑、关键代码、运行步骤和观察结果。建议先照着跑通，再回头看对应的规范章节。P4Runtime 里很多细节，例如 bytestring 编码和 primary controller 权限，只看消息结构很容易漏掉。
