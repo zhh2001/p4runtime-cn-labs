@@ -10,8 +10,7 @@
 | 04 批量操作与错误 | 一个 batch 部分失败时能看到什么？ | error reporting、atomicity |
 | 05 Counter 与 Meter | 控制面如何观察并约束流量？ | CounterEntry、MeterEntry |
 | 06 Selector 与复制 | ECMP 和 multicast 在 API 中怎样表达？ | ActionProfile、PRE |
-| 07 Packet I/O | 数据包如何经过控制面再回到 pipeline？ | PacketIn、PacketOut |
-| 08 Controller 主备 | primary 失效后谁能继续写设备？ | client arbitration |
+| 07 Packet I/O 与主备 | 数据包怎样经过控制面，primary 失效后谁来接管？ | PacketIn、PacketOut、client arbitration |
 
 ## 每个实验的完成标准
 
@@ -26,3 +25,5 @@
 ## 不在第一版处理的内容
 
 第一版不覆盖硬件 target、厂商 SDK、完整 PSA extern、自定义 role config 和生产环境 TLS。它们都很重要，但会让入门路线从“理解 P4Runtime”偏到部署细节。
+
+七个实验完成后，继续阅读 [v1.5 变更导读](p4runtime-v1.5.md)和[兼容性说明](compatibility.md)。它们把规范新增字段与当前 BMv2 能运行的部分分开列出。

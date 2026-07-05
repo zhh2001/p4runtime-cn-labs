@@ -33,6 +33,8 @@ make check-env
 
 小版本不完全一致通常没有关系。出现行为差异时，先记录 `p4c --version` 和 `simple_switch_grpc --version`，再对照实验中的已知限制。
 
+仓库实际验证过的组合和功能边界见[兼容性说明](compatibility.md)。
+
 ## Python 环境为何分开
 
 交互实验会用到 `p4runtime-shell==0.0.6`。它当前固定依赖 P4Runtime 1.4.1，因此放在 `.venv-shell`。
@@ -59,4 +61,6 @@ Mininet 创建 network namespace 和虚拟网卡时需要 root 权限。仓库�
 sudo mn -c
 ```
 
-后续实验还会提供自己的清理命令，不需要手工查杀 BMv2 进程。
+仓库的统一清理入口是 `sudo make stop`，正常情况下不需要手工查杀 BMv2 进程。
+
+如果端口仍被占用、Python 依赖冲突或 RPC 返回权限错误，按[排错清单](troubleshooting.md)逐项检查。

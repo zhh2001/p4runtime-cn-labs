@@ -5,9 +5,10 @@
 ## 规范
 
 - [P4Runtime Specification v1.5.0](https://p4lang.github.io/p4runtime/spec/v1.5.0/P4Runtime-Spec.html)
+- [Changes in P4Runtime v1.5.0](https://p4lang.github.io/p4runtime/spec/v1.5.0/P4Runtime-Spec.html#_changes_in_v1_5_0)
 - [P4Runtime v1.5.0 Protobuf definitions](https://github.com/p4lang/p4runtime/tree/v1.5.0/proto)
 - [P4_16 Language Specification v1.2.5](https://p4.org/wp-content/uploads/sites/53/2024/10/P4-16-spec-v1.2.5.html)
-- [Portable Switch Architecture v1.1.0](https://p4.org/p4-spec/docs/PSA-v1.1.0.html)
+- [Portable Switch Architecture v1.1.0](https://p4.org/wp-content/uploads/sites/53/p4-spec/docs/PSA-v1.1.0.pdf)
 
 ## 工具
 

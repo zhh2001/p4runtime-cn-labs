@@ -1,0 +1,54 @@
+name: check
+
+on:
+  push:
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  code:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-python@v6
+        with:
+          python-version: "3.12"
+          cache: pip
+      - name: Install Python dependencies
+        run: python -m pip install --disable-pip-version-check -r requirements.txt
+      - name: Check Python and shell files
+        run: |
+          python -m py_compile scripts/*.py tools/*.py p4rt/*.py labs/*/*.py tests/*.py
+          bash -n scripts/*.sh
+      - name: Run unit tests
+        run: python -m unittest discover -s tests -v
+      - name: Check local Markdown links
+        run: python scripts/check-markdown-links.py
+      - name: Compile every P4 program
+        run: |
+          docker run --rm -v "$PWD:/workspace" -w /workspace \
+            p4lang/p4c:1.2.5.13 sh -eu -c '
+              mkdir -p /tmp/p4-build
+              for source in labs/*/main.p4; do
+                lab=$(basename "$(dirname "$source")")
+                p4c-bm2-ss --std p4-16 \
+                  --p4runtime-files "/tmp/p4-build/$lab.p4info.txtpb" \
+                  --p4runtime-format text \
+                  -o "/tmp/p4-build/$lab.json" \
+                  "$source"
+              done
+            '
+
+  links:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v6
+      - name: Check external links
+        uses: lycheeverse/lychee-action@v2
+        with:
+          args: --no-progress --root-dir . './**/*.md'
+          fail: true
+          lycheeVersion: v0.24.2
+          token: ${{ secrets.GITHUB_TOKEN }}
