@@ -54,6 +54,8 @@ make setup
 
 然后按 [P4Runtime Shell 与 TableEntry](labs/02-table-entry/README.md) 中的双终端步骤启动 Mininet、安装 pipeline，并写入第一组转发表项。
 
+完成 Shell 实验后，可以在[自己建立 P4Runtime session](labs/03-python-client/README.md)中改用 1.5.0 Python bindings，观察 arbitration、Capabilities 和 pipeline RPC 的实际消息流。
+
 ## 阅读方式
 
 每个实验都会给出目标、拓扑、关键代码、运行步骤和观察结果。建议先照着跑通，再回头看对应的规范章节。P4Runtime 里很多细节，例如 bytestring 编码和 primary controller 权限，只看消息结构很容易漏掉。

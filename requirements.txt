@@ -1,0 +1,2 @@
+p4runtime==1.5.0
+protobuf==3.20.3
