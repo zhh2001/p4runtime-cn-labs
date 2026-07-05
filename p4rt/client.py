@@ -301,6 +301,30 @@ class P4RuntimeClient:
         for result in self.read([query]):
             yield result.meter_entry
 
+    def read_profile_members(self, profile_name_or_id: str | int):
+        if self.p4info_index is None:
+            raise RuntimeError("尚未读取 P4Info")
+        profile_id = self.p4info_index.resolve("action_profile", profile_name_or_id).id
+        query = p4runtime_pb2.Entity()
+        query.action_profile_member.action_profile_id = profile_id
+        for result in self.read([query]):
+            yield result.action_profile_member
+
+    def read_profile_groups(self, profile_name_or_id: str | int):
+        if self.p4info_index is None:
+            raise RuntimeError("尚未读取 P4Info")
+        profile_id = self.p4info_index.resolve("action_profile", profile_name_or_id).id
+        query = p4runtime_pb2.Entity()
+        query.action_profile_group.action_profile_id = profile_id
+        for result in self.read([query]):
+            yield result.action_profile_group
+
+    def read_multicast_groups(self, group_id: int = 0):
+        query = p4runtime_pb2.Entity()
+        query.packet_replication_engine_entry.multicast_group_entry.multicast_group_id = group_id
+        for result in self.read([query]):
+            yield result.packet_replication_engine_entry.multicast_group_entry
+
     def _require_connected(self) -> None:
         if self.stub is None:
             raise RuntimeError("client 尚未连接")

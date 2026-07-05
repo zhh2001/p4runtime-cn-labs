@@ -60,6 +60,8 @@ make setup
 
 [Counter 与 Meter](labs/05-resources/README.md)把控制面读写和真实流量接起来，比较 direct resource 与独立 extern array 的寻址方式。
 
+[Action Selector 与 Multicast](labs/06-selector-replication/README.md)继续处理间接引用、ECMP group 与 PRE，并明确区分 v1.5 bindings 可表示的字段和 BMv2 真正支持的行为。
+
 ## 阅读方式
 
 每个实验都会给出目标、拓扑、关键代码、运行步骤和观察结果。建议先照着跑通，再回头看对应的规范章节。P4Runtime 里很多细节，例如 bytestring 编码和 primary controller 权限，只看消息结构很容易漏掉。
