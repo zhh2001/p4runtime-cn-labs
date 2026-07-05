@@ -1,5 +1,7 @@
 # P4Runtime 中文教程
 
+[![check](https://github.com/zhh2001/p4runtime-cn-labs/actions/workflows/check.yml/badge.svg)](https://github.com/zhh2001/p4runtime-cn-labs/actions/workflows/check.yml)
+
 这个仓库记录我学习 P4Runtime 控制平面的过程。重点是用几个能跑起来的小实验，弄清楚 controller 怎样认识并配置一条 P4 pipeline。
 
 教程面向已经了解 Ethernet、IPv4、路由表等基本概念的读者。没有接触过 P4 也可以从头跟，但这里不会系统讲解 P4_16 语法（P4 语法可以在 [p4-language-guide-zh](https://github.com/zhh2001/p4-language-guide-zh) 学习），只会补上实验需要的部分。
