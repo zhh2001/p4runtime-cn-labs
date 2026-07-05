@@ -109,7 +109,7 @@ test: python-env
 
 check: check-env
 	@bash -n scripts/check-env.sh scripts/setup-shell-env.sh scripts/setup-python-env.sh
-	@python3 -m py_compile scripts/inspect-p4info.py
+	@python3 -m py_compile scripts/inspect-p4info.py scripts/check-markdown-links.py
 	@python3 -m py_compile tools/p4_mininet.py labs/02-table-entry/topology.py labs/03-python-client/topology.py labs/04-write-read/topology.py labs/05-resources/topology.py labs/06-selector-replication/topology.py labs/07-stream-arbitration/topology.py
 	@python3 -m py_compile p4rt/*.py labs/03-python-client/controller.py labs/04-write-read/controller.py labs/05-resources/controller.py labs/06-selector-replication/controller.py labs/07-stream-arbitration/controller.py tests/*.py
 	@$(MAKE) --no-print-directory inspect LAB=01 >/dev/null
@@ -125,4 +125,5 @@ check: check-env
 	@python3 scripts/inspect-p4info.py build/01-pipeline/p4info.txtpb | grep -q '^table .*0x02'
 	@grep -q 'match_type: EXACT' build/02-table-entry/p4info.txtpb
 	@grep -q 'match_type: LPM' build/02-table-entry/p4info.txtpb
+	@python3 scripts/check-markdown-links.py >/dev/null
 	@echo "当前检查通过。"

@@ -76,5 +76,3 @@ ID 的高 8 bit 表示对象类型，低 24 bit 是该类型下的编号。编�
 ## 可以顺手试试
 
 把 `route_v4` 的 `size` 改成 128 后重新编译，观察 P4Info 的变化。也可以临时改名再比较 ID，看完后恢复即可。
-
-这一章对应规范中的 [Reference Architecture](https://p4lang.github.io/p4runtime/spec/v1.5.0/P4Runtime-Spec.html#sec-p4runtime-reference-architecture)、[P4Info](https://p4lang.github.io/p4runtime/spec/v1.5.0/P4Runtime-Spec.html#sec-p4info) 和 [ID allocation](https://p4lang.github.io/p4runtime/spec/v1.5.0/P4Runtime-Spec.html#sec-p4info-objects-id)。下一章会把这两个编译结果交给 `simple_switch_grpc` 和 P4Runtime Shell。

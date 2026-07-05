@@ -90,5 +90,3 @@ index.table(0x02c60dcf)  # 这里只是示意，不要硬编码实际 ID
 ```
 
 运行结束时 context manager 会关闭 stream 和 channel。回到 Mininet 终端输入 `exit`；异常退出时使用 `sudo make stop`。
-
-对应规范章节：[Client Arbitration](https://p4lang.github.io/p4runtime/spec/v1.5.0/P4Runtime-Spec.html#sec-client-arbitration)、[Forwarding Pipeline Configuration](https://p4lang.github.io/p4runtime/spec/v1.5.0/P4Runtime-Spec.html#sec-p4-forwarding-pipeline-config)、[Capabilities](https://p4lang.github.io/p4runtime/spec/v1.5.0/P4Runtime-Spec.html#sec-capabilities-rpc)。

@@ -87,5 +87,3 @@ controller 还会依次完成：
 `DELETE` 的身份由 table ID、match fields 和必要时的 priority 决定，action 内容不参与定位。实验代码为了复用同一个对象仍保留 action，BMv2 会忽略这些非 key 字段。
 
 退出 Mininet 后 forwarding state 会消失。异常退出使用 `sudo make stop`。
-
-对应规范章节：[Error Reporting](https://p4lang.github.io/p4runtime/spec/v1.5.0/P4Runtime-Spec.html#sec-error-reporting)、[Write RPC](https://p4lang.github.io/p4runtime/spec/v1.5.0/P4Runtime-Spec.html#sec-write-rpc)、[Read RPC](https://p4lang.github.io/p4runtime/spec/v1.5.0/P4Runtime-Spec.html#sec-read-rpc)。

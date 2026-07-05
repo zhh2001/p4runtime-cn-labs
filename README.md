@@ -6,7 +6,7 @@
 
 ## 会做哪些实验
 
-第一版计划包含八个实验：
+第一版包含七个实验：
 
 1. 编译一条最小 pipeline，查看 P4Info；
 2. 用 P4Runtime Shell 安装 pipeline、读写表项；
@@ -14,8 +14,7 @@
 4. 处理 Read、Write、batch 和错误详情；
 5. 读取 counter，配置 meter；
 6. 使用 ActionProfile、ECMP 和 multicast；
-7. 收发 PacketIn、PacketOut；
-8. 观察两个 controller 之间的 arbitration。
+7. 收发 PacketIn、PacketOut，并观察两个 controller 之间的 arbitration。
 
 代码以 Ubuntu 24.04、Mininet 和 BMv2 `simple_switch_grpc` 为主要环境。协议语义以 [P4Runtime v1.5.0](https://p4lang.github.io/p4runtime/spec/v1.5.0/P4Runtime-Spec.html) 为准。如果 BMv2 暂时不支持某项新能力，正文会直接标出来。
 
@@ -37,7 +36,7 @@ make check-env
 
 详细说明见[环境准备](docs/setup.md)。如果你已经有一套能运行 P4 官方 tutorials 的环境，通常不需要重复安装。
 
-第一个实验已经可以运行：
+从第一个实验开始：
 
 ```bash
 make build LAB=01
@@ -64,11 +63,21 @@ make setup
 
 [Packet I/O 与控制器仲裁](labs/07-stream-arbitration/README.md)把 StreamChannel 用起来：转发 PacketIn/PacketOut，并实际观察 primary、backup 和接管过程。
 
+完成实验后，可以用 [v1.5 变更导读](docs/p4runtime-v1.5.md)核对新字段。工具之间的版本边界见[兼容性说明](docs/compatibility.md)，遇到环境或运行问题先查[排错清单](docs/troubleshooting.md)。
+
 ## 阅读方式
 
 每个实验都会给出目标、拓扑、关键代码、运行步骤和观察结果。建议先照着跑通，再回头看对应的规范章节。P4Runtime 里很多细节，例如 bytestring 编码和 primary controller 权限，只看消息结构很容易漏掉。
 
-仓库仍在按实验逐步补齐。当前路线和各阶段边界放在[学习路线](docs/roadmap.md)，常见名称可查[术语表](docs/glossary.md)。
+完整顺序放在[学习路线](docs/roadmap.md)，常见名称可查[术语表](docs/glossary.md)。
+
+## 提交前检查
+
+```bash
+make check
+```
+
+它会重新编译全部 P4 程序、运行 Python 单元测试、检查脚本语法和仓库内 Markdown 链接。GitHub Actions 另用固定的 `p4lang/p4c:1.2.5.13` 编译，并检查外部链接；需要 root 权限的 Mininet smoke test 只在本机运行。
 
 ## 许可
 
