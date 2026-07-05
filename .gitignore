@@ -10,6 +10,7 @@ __pycache__/
 build/
 *.p4i
 *.p4info.txt
+*.p4info.txtpb
 *.p4info.bin
 *.bmv2.json
 
