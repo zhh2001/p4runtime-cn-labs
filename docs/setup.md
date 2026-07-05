@@ -39,6 +39,14 @@ make check-env
 
 后面的 Python controller 直接使用官方 `p4runtime==1.5.0` bindings，放在 `.venv`。两个环境不混装，可以避免 pip 为了解决依赖而悄悄降级。对应的安装命令会随实验一起加入。
 
+当前可以用下面的命令创建 Shell 环境：
+
+```bash
+make setup
+```
+
+脚本会打印最终安装的 `p4runtime-shell` 和 `p4runtime` 版本，重复执行不会重建已经存在的 venv。
+
 ## 关于 sudo
 
 Mininet 创建 network namespace 和虚拟网卡时需要 root 权限。仓库脚本不会保存密码，也不会把凭据放进命令参数。实验中只对启动、停止拓扑和清理残留接口使用 `sudo`。
