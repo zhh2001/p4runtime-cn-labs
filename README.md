@@ -52,7 +52,7 @@ make inspect LAB=01
 make setup
 ```
 
-然后按 [P4Runtime Shell](labs/02-table-entry/README.md) 中的双终端步骤启动 Mininet 并安装 pipeline。
+然后按 [P4Runtime Shell 与 TableEntry](labs/02-table-entry/README.md) 中的双终端步骤启动 Mininet、安装 pipeline，并写入第一组转发表项。
 
 ## 阅读方式
 

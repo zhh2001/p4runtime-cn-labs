@@ -30,7 +30,9 @@ struct headers_t {
     ipv4_t ipv4;
 }
 
-struct metadata_t { }
+struct metadata_t {
+    bit<1> source_allowed;
+}
 
 parser PacketParser(
     packet_in packet,
@@ -68,6 +70,10 @@ control IngressPipe(
         mark_to_drop(standard_meta);
     }
 
+    action permit() {
+        meta.source_allowed = 1;
+    }
+
     action rewrite_and_forward(
         bit<48> src_mac,
         bit<48> dst_mac,
@@ -91,9 +97,25 @@ control IngressPipe(
         default_action = drop();
     }
 
+    table allow_src {
+        key = {
+            hdr.ipv4.src_addr: exact;
+        }
+        actions = {
+            permit;
+            drop;
+        }
+        size = 64;
+        default_action = drop();
+    }
+
     apply {
         if (hdr.ipv4.isValid()) {
-            route_v4.apply();
+            meta.source_allowed = 0;
+            allow_src.apply();
+            if (meta.source_allowed == 1) {
+                route_v4.apply();
+            }
         } else {
             drop();
         }

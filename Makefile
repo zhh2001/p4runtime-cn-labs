@@ -87,4 +87,6 @@ check: check-env
 	@python3 -m json.tool build/01-pipeline/pipeline.json >/dev/null
 	@python3 scripts/inspect-p4info.py build/01-pipeline/p4info.txtpb | grep -q '^action .*0x01'
 	@python3 scripts/inspect-p4info.py build/01-pipeline/p4info.txtpb | grep -q '^table .*0x02'
+	@grep -q 'match_type: EXACT' build/02-table-entry/p4info.txtpb
+	@grep -q 'match_type: LPM' build/02-table-entry/p4info.txtpb
 	@echo "当前检查通过。"
